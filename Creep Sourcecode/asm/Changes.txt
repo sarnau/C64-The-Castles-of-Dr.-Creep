@@ -1,0 +1,67 @@
+Changes
+  ColdStart routine shortened
+    Whole useless section $2c10-$2e1b removed
+    SetTabCtrlOff routine removed - data now directly stored
+    CpySounds     routine removed - not necessary anymore
+  FlgSfxOnOff   switch removed
+  Flags after Object jump tab removed - not used
+  Flag  SavNoUse removed
+  TabSoundsDataPtr sound effect modified
+  DemoHandler Routine
+    SavDemoRoomNo   initialized to $ff - start demo at room $00
+    SavNumFirePress moved up
+  BIT masks reduced
+  Sound-fx data moved up before SetLvlLoadScrn routine
+  VerifyDisk removed completely
+  Sprites/Objects sorted 
+  SaveFile SaveFileHdr address corrected
+.hbu001.
+  make key data numbers movable
+.hbu002.
+  make trap sound data movable
+.hbu003.
+  players room arrival sprite updated for looking left or right
+.hbu004.
+  make frank ladder u/d data movable
+.hbu005.
+  Player short ladder start modified
+  Frank  short ladder start modified
+  Sprites modified/corrected
+.hbu006.
+  Mummy active wait
+.hbu007.
+  Key pick pings / enter room pings vary with their colors
+.hbu008.
+  reduce flicker in call warmstart
+.hbu009.
+  mummy wall new end piece
+.hbu010.
+  variables / buffers / tables splitted from code
+  WaitDiskReady removed
+  code shortened
+.hbu011.
+  same load/save filename areas and init save replace
+  new save file id "X"
+.hbu012.
+  always do a level reload to CC_LevelGame - load area $9800 freed
+.hbu013.
+  table moves to freed memory of .hbu012.
+.hbu014.
+  make castle data file movable
+.hbu015.
+  indroduce a seperate map hires screen
+.hbu016.
+  player map arrows/text/time recoloring
+.hbu017.
+  after death replay the same room - all data restored except time
+.hbu018.
+  show white number of lives in time frame
+.hbu019.
+  actions no longer possible by keeping the fire button pressed permanently
+  fire button must now be pressed exactly in front of the object
+  except ray gun
+.hbu020.
+  save/restore removed
+.hbu021.
+  no gun moves if pole length is zero - avoid repaint
+  

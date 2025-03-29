@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ufwb version="1.24">
+    <grammar name="PRG grammar" start="id:1" author="Markus Fritze" fileextension="prg">
+        <description>Grammar for PRG files</description>
+        <structure name="C64 Data File" id="1" length="0" encoding="ISO_8859-1:1987" endian="little" signed="no">
+            <number name="Load Address" id="2" type="integer" length="2" display="hex" valueexpression="0x7800"/>
+            <structure name="Castle" id="76" length="0" consists-of="id:3"/>
+        </structure>
+        <structure name="Doctor Creep Castle" id="3" encoding="ISO_8859-1:1987" endian="big" signed="no">
+            <structure name="Castle" id="4">
+                <number name="Size of the Castle" id="5" type="integer" length="2" display="hex"/>
+                <number name="Flags" id="6" type="integer" length="1" display="hex"/>
+                <structure name="Starting Room" id="7" length="0">
+                    <number name="Player 1" id="8" type="integer" length="1"/>
+                    <number name="Player 2" id="9" type="integer" length="1"/>
+                </structure>
+                <structure name="Starting Door" id="11" length="0">
+                    <number name="Player 1" id="12" type="integer" length="1"/>
+                    <number name="Player 2" id="13" type="integer" length="1"/>
+                </structure>
+                <structure name="Remaining Lives" id="15" length="0">
+                    <number name="Player 1" id="16" type="integer" length="1"/>
+                    <number name="Player 2" id="17" type="integer" length="1"/>
+                </structure>
+                <structure name="Current Player Room" id="19" length="0">
+                    <number name="Player 1" id="20" type="integer" length="1"/>
+                    <number name="Player 2" id="21" type="integer" length="1"/>
+                </structure>
+                <structure name="Current Player Door" id="23" length="0">
+                    <number name="Player 1" id="24" type="integer" length="1"/>
+                    <number name="Player 2" id="25" type="integer" length="1"/>
+                </structure>
+                <structure name="Current Player State" id="27" length="0">
+                    <number name="Player 1-5-1" id="28" type="integer" length="1"/>
+                    <number name="Player 2-5-1" id="29" type="integer" length="1"/>
+                </structure>
+                <structure name="Current Player Active Flag" id="31" length="0">
+                    <number name="Player 1-6-1" id="32" type="integer" length="1"/>
+                    <number name="Player 2-6-1" id="33" type="integer" length="1"/>
+                </structure>
+                <number name="unknown" id="35" type="integer" length="1"/>
+                <number name="Number of current players" id="36" type="integer" length="1"/>
+                <structure name="Current Number of Keys per Player" id="37" length="0">
+                    <number name="Player 1-7-1" id="38" type="integer" length="1"/>
+                    <number name="Player 2-7-1" id="39" type="integer" length="1"/>
+                </structure>
+                <structure name="Current Keys" id="41" length="0">
+                    <number name="Player 1-8-1" id="42" repeatmin="32" repeatmax="32" type="integer" length="1"/>
+                    <number name="Player 2-8-1" id="43" repeatmin="32" repeatmax="32" type="integer" length="1"/>
+                </structure>
+                <structure name="Current Player Playtime" id="45" length="0">
+                    <number name="Player 1-9-1" id="46" repeatmin="4" repeatmax="4" type="integer" length="1"/>
+                    <number name="Player 2-9-1" id="47" repeatmin="4" repeatmax="4" type="integer" length="1"/>
+                </structure>
+                <structure name="Unknown" id="49" length="0">
+                    <number name="Player 1-10" id="50" type="integer" length="1"/>
+                    <number name="Player 2-10" id="51" type="integer" length="1"/>
+                </structure>
+                <number name="Escape Castle Pointer" id="53" type="integer" length="2" display="hex"/>
+                <binary name="Header Filler" id="54" length="159"/>
+            </structure>
+            <structure name="Rooms" id="56" length="0" consists-of="id:57">
+                <structref name="Room" id="58" repeatmax="13" structure="id:57"/>
+            </structure>
+        </structure>
+        <structure name="Doctor Creep Room" id="57" encoding="ISO_8859-1:1987" endian="big" signed="no">
+            <number name="Flag: Visible to Players" id="62" type="integer" length="1" lengthunit="bit" display="binary"/>
+            <number name="Flag: Last Room" id="63" type="integer" length="1" lengthunit="bit" display="binary"/>
+            <number name="Flag: unused" id="64" type="integer" length="2" lengthunit="bit"/>
+            <number name="Room Color" id="65" type="integer" length="4" lengthunit="bit"/>
+            <number name="X" id="66" type="integer" length="1"/>
+            <number name="Y" id="67" type="integer" length="1"/>
+            <number name="2 Bit Filler" id="68" type="integer" length="2" lengthunit="bit"/>
+            <number name="Width" id="69" type="integer" length="3" lengthunit="bit"/>
+            <number name="Height" id="70" type="integer" length="3" lengthunit="bit"/>
+            <offset name="Doors" id="74" length="2" references="id:1" additional="-30720" follownullreference="yes"/>
+            <offset name="Objects" id="75" length="2" references="id:1" additional="-30720" follownullreference="yes"/>
+        </structure>
+    </grammar>
+</ufwb>
