@@ -348,27 +348,42 @@ Zero-page pointers: `_mRoomPtr` = 0x42/0x43, `mObjectPtr` = 0x3e/0x3f, door poin
 
 ## 9. Open questions / limits
 
-These are honest limits given a read-only call-graph navigation (no raw memory/strings/xref
-access — the layout below is inferred purely from how code *indexes* the data):
+Most of the items originally listed here were **resolved** by cross-referencing the reconstructed
+source (`Creep Sourcecode/inc/CC_Objects.asm`, `CC_WorkAreas.asm`), which gives the byte-exact
+field layouts the Ghidra call-graph pass could only infer. Kept here for the record:
 
-1. **Exact door→target-room linkage.** The draw and spawn paths only read door bytes 0,1,2,5,6.
-   Bytes 3, 4, 7 of each door record are not touched by the analyzed routines, so I cannot
-   confirm where the *destination room index* and *destination door index* are stored. They are
-   most plausibly in those unread bytes (or supplied by the door object's handler in the object
-   list). Confirming this needs the run-time door-collision/transition handler reached through
-   `object_Execute` (inside `events_Execute`), which I did not fully trace.
+### Resolved
 
-2. **`flagsAndColor` bit 4/5 semantics.** Only color (bits 0–3), VISIBLE (bit 6) and
-   STOP_DRAW (bit 7) were observed in use. Any meaning of bits 4–5 is unconfirmed.
+1. **Door record layout & door→room linkage** (`CC_Obj_Door*`, `CC_Obj_DoorDataLen = $08`):
 
-3. **Absolute base of the door/object lists.** I confirmed the *pointers* (room offsets 4–5
-   and 6–7) and that the intro path biases the high byte by +0x20 (objects) / works off 0x9900
-   (rooms). The concrete on-disk addresses of the per-castle door/object blobs depend on the
-   loaded image and were not read directly.
+   | Off | Field | Meaning |
+   |----:|-------|---------|
+   | +0 | `GridCol` | door position (top-left) |
+   | +1 | `GridRow` | |
+   | +2 | `InWallId` | bits 0–1 = map wall dir (`0`=N `1`=E `2`=S `3`=W); **bit 7 = door open** |
+   | +3 | `ToRoomNo` | **destination room index** (into the room table) |
+   | +4 | `ToDoorNo` | **destination door index** (which door you arrive at) |
+   | +5 | `MapMapOffCol` (`MapOffCol`) | map-arrow column offset |
+   | +6 | `MapOffRow` | map-arrow row offset |
+   | +7 | `Type` | `0`=normal gate, `1`=castle exit |
 
-4. **`widthAndHeight` upper bits.** Bits 0–2 (width) and 3–5 (height) are read by `_mapRoomDraw`.
-   Bits 6–7 are masked off and their meaning, if any, is unknown.
+   So the destination is bytes **3 (room)** and **4 (door)** — exactly the previously-unread
+   bytes. A door list is a count byte followed by these 8-byte records (room record offsets 4–5
+   point at it).
 
-5. **Threaded-code opcode set.** `_room_Draw` calls arbitrary handler addresses; I documented the
-   mechanism and one handler (`obj_TextDraw`) as the canonical "consume your own inline params"
-   pattern, but I did not enumerate every object handler or its parameter layout.
+2. **Threaded-code handler set.** The `$08xx` handler IDs are the 18 entries of `ID_Jump_Table`
+   (dispatched by `PaintRoomItems`, `object.asm:2162`): `$0803` Door, `$0806` Floor, `$0809`
+   Pole, `$080c` Ladder, `$080f` DoorBell, `$0812` LightMachine, `$0815` ForceField, `$0818`
+   Mummy, `$081b` Key, `$081e` Lock, `$0821` Object, `$0824` RayGun, `$0827` MatterXmitter,
+   `$082a` TrapDoor, `$082d` SideWalk, `$0830` FrankenStein, `$0833` TextLine, `$0836` Graphic.
+
+3. **`flagsAndColor`** (`CC_Obj_RoomColor`): bits 0–3 = colour (`CC_Obj_RoomColorMask = $0f`),
+   **bit 7 = room already visited** (`CC_Obj_RoomVisited`). The VISIBLE/STOP_DRAW flags the map
+   pass keys off are the runtime `_MAP_ROOM_*` bits in this same byte.
+
+### Still open
+
+- **`widthAndHeight` bits 6–7** are masked off by `_mapRoomDraw`; no use observed.
+- **`flagsAndColor` bits 4–5** — no use observed.
+- The concrete on-disk addresses of per-castle door/object blobs depend on the loaded `z*.prg`
+  (base `$7800`); they are reached only via the room-record pointers, never at a fixed address.

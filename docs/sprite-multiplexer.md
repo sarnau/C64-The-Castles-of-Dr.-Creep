@@ -389,20 +389,33 @@ flowchart LR
 
 ## 8. Open questions / limits
 
-- **Raw data tables not byte-read.** The available Ghidra endpoints decompile only
-  *code inside defined functions*, so the contents of `mObjectData[]`,
-  `TabSpriteDataPtr`, `CONST_BITMASK_TAB`/`TabSelectABit` (`$2F82`) and the
-  flag-mask bytes at `$0883..$0889` were inferred from the **access patterns** and
-  confirmed against the reconstructed source, not dumped directly from the binary.
-  The exact pointer values in `mObjectData[].executePtr/collisionPtr/...` are not
-  reproduced here.
-- **Source vs. dump drift.** The reconstructed `object.asm` is an extremely close
-  match to the dump (identical instruction sequences for the routines analysed),
-  but it is not guaranteed byte-identical to the specific build in
-  `C64_MEMORY_DUMP.BIN`. Where Ghidra field names (`collisionCheckCounter`) and
-  source names (`SeqOld/SeqNo`) for record bytes `+5/+6` disagree, both are noted;
-  the runtime behaviour (countdown reloaded from `+6`) is taken from the dump's
-  disassembly and is authoritative.
+**Resolved from source** (`Creep Sourcecode/inc/CC_WorkAreas.asm`, `CC_DataSprites.asm`). The
+sprite **work-area record** (`CC_WaS_Common`, `CC_WaS_DataLen = $20`, max `$08` slots) is:
+
+| Off | Field | | Off | Field |
+|----:|-------|-|----:|-------|
+| +0 | `SpriteFlag` (state, see below) | | +0a | `Cols` / +0b `Rows` |
+| +1 | `SpriteType` (`$00`Player `$01`Spark `$02`Force `$03`Mummy `$04`Beam `$05`Frank) | | +0c | `StepX` / +0d `StepY` (next-pos delta) |
+| +2 | `PosX` / +3 `PosY` | | +0e | `PlayerFire` |
+| +4 | `SpriteNo` (shape) | | +1d | `MoveDir` (joystick) |
+| +5 | `SeqOld` / +6 `SeqNo` (anim sequence) | | +1e | per-type union (`PlayerMoveDir` / `ForceFieldMode` / `EnemyStatus` / `BeamWaOff`) |
+| +8 | `Death` (death-tune mod) | | +1f | `Work` |
+| +9 | `Attrib` (X/Y-expand, prio, MC, colour — from the sprite look byte) | | | |
+
+`SpriteFlag` bits: `$00` active, `$01` inactive (free slot), `$02` sprite-sprite collision,
+`$04` sprite-bg collision, `$10` pending action, `$20` death, `$40` dead (mortal), `$80` init.
+This confirms record bytes `+5/+6` are `SeqOld/SeqNo` (Ghidra's `collisionCheckCounter` guess was
+wrong), and gives the individual sprite colours (player=YELLOW, spark/mummy/force=WHITE, beam=RED,
+frank=GREY), with shared multicolours `$D025`=LT_RED, `$D026`=LT_GREEN.
+
+**Source vs. dump — confirmed different builds.** The reconstructed `object.asm` ("Dr Creep 3")
+and `C64_MEMORY_DUMP.BIN` share structure/format but sit at different RAM bases (sprite WA: dump
+`$bd00`, source `$9d00`; a `$2000` shift). Field offsets and flag bits above hold for both.
+
+### Still open
+
+- **Raw table pointer values** (`mObjectData[].executePtr/…`, `TabSpriteDataPtr`) aren't reproduced
+  here — the layout/stride is confirmed but the individual dump pointer bytes weren't dumped.
 - **`hw_SpritePrepare` / `_Sprite_CreepGetFree` addresses.** These are reachable
   via `CopySpriteData` / `GetNewSpriteWA` in the source but were not pinned to a
   specific dump address through the call-graph endpoints available here; the

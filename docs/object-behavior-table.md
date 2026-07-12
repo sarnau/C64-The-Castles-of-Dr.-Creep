@@ -359,31 +359,51 @@ entity; listed here next to its sibling for completeness.)*
 
 ## 6. Open questions / limits
 
-- **The raw `_ANIM_TABLE` (and `mObjectData`) bytes were not directly readable.** The available
-  Ghidra endpoints only decompile/disassemble *inside defined functions*; there is no
-  read-memory or list-symbols endpoint. Therefore the precise **numeric `type` → table-slot →
-  handler-pointer mapping could not be dumped**. The table **base addresses are confirmed**
-  (`_ANIM_TABLE` @ `0x0842`, 4-byte entries indexed `type<<2`; `mObjectData` @ `0x088f`, 8-byte
-  entries indexed `spriteType<<3`), and the **entry layout is confirmed** (`.execute`/`.inFront`
-  for objects; `.executePtr`/`.collisionPtr` for sprites). The handlers themselves were
-  enumerated by following the call graph and by matching `OBJECT_TYPE_*` constants used in the
-  code, *not* by reading the pointer table — so the association of a given handler to its exact
-  numeric type index is inferred from naming/usage, not byte-verified.
-- **Numeric values of `OBJECT_TYPE_*` and `_ITM_*`** are stored in data cells the endpoints can't
-  read; only their symbolic names and the RAM addresses of the bit-masks (`_ITM_EXECUTE`=`0x0840`,
-  `_ITM_PICKED`=`0x0841`) are confirmed.
-- **The master room-load orchestrator** (the routine that calls the `obj_*_Draw` builders in
-  sequence while parsing castle data) was not pinned to a single address; the builders themselves
-  and `object_Create` are confirmed, which fully establishes the spawn pipeline, but the top-level
-  dispatch order is inferred (door section first, since `OBJECT_TYPE_DOOR` is `object_Create`'s
-  default).
-- **Exact byte offsets of a few `mRoomAnim`/`mRoomObjects` fields** (`mWidth`, `mHeight`,
-  `tickExecuteDelay`, `state`, `color`) within the 8-byte records were read by Ghidra field name
-  but not each individually byte-verified against an absolute offset; offsets `+0`, `+4` (and the
-  parallel `+0` for `mRoomObjects.objNumber`) are confirmed from the disassembly.
-- The `obj_Frankie_Execute` start address is given approximately (`~0x3a8d`); its body is
-  confirmed (the decompiler returns it for `0x3b00`–`0x3d6b`), but the exact entry label was not
-  isolated.
+The items originally flagged here have now been **byte-verified against the reconstructed source**
+(`Creep Sourcecode/inc/CC_WorkAreas.asm`, `asm/object.asm`). Note the source (a "Dr Creep 3" build)
+and the Ghidra dump are **different builds**: identical structure/formats but the work-area RAM
+base differs by `$2000` (object common WA: dump `$bf00`, source `$9f00`; sprite WA: dump `$bd00`,
+source `$9d00`). Field offsets, flag bits and type numbers are the same in both.
+
+**Object type numbers** (`CC_WaO_ObjectType`, +0 of the common work area — the `_ANIM_TABLE`
+index):
+
+| # | Type | # | Type |
+|---|------|---|------|
+| `$00` | Door | `$08` | RayGun (phaser) |
+| `$01` | DoorBell | `$09` | RayGunSwitch |
+| `$02` | LightBall (lightning ball) | `$0a` | XmitReceiveOval (teleporter) |
+| `$03` | LightSwitch | `$0b` | TrapDoor |
+| `$04` | ForceField | `$0c` | TrapSwitch |
+| `$05` | Mummy | `$0d` | SideWalk (conveyor) |
+| `$06` | Key | `$0e` | SideWalkSwitch |
+| `$07` | Lock | `$0f` | Frankenstein |
+
+**Sprite type numbers** (`CC_WaS_SpriteType`, +1 of the sprite work area): `$00` Player, `$01`
+Spark, `$02` Force, `$03` Mummy, `$04` Beam, `$05` Frank.
+
+**Dispatch tables** — in the source the object `_ANIM_TABLE` is `ObjectMoveAuto`/`ObjectMoveManu`
+(interleaved, 4 bytes/type = `{auto per-frame handler, manual player-action handler}` = the
+`.execute`/`.inFront` pair). The sprite `mObjectData` is the `SpriteMove` table, **8 bytes/type**:
+`{SpriteMove (move), SpriteSpriteKill (sprite-collision), SpriteObjectKill (object-collision),
+SpriteCollisionPrio (byte), SpriteMortality (byte)}` — three pointers, not two.
+
+**Object flag byte** (`CC_WaO_ObjectFlag`, common WA +4; the dump's `_ITM_*` masks): `$20` = Move
+(per-frame handler due — the doc's `_ITM_EXECUTE`), `$40` = Ready (action completed), `$80` = Init
+(just initialised).
+
+**Object common work-area record** (8 bytes): +0 Type, +1 GridCol, +2 GridRow, +3 ObjectNo,
++4 Flag, +5 Cols (×4), +6 Rows. The parallel **special/type record** (`CC_WaO_Type`, 8 bytes) is a
+per-type union — e.g. Door `{+0 DoorNo, +1 shut/open, +2 liftCount, +3 targetRoomColour}`,
+ForceField `{+0 No, +1 pingSecs, +2 timer}`, Mummy `{+0 ptrWA, +1 timer, +2 ankhColour}`, etc.
+
+**Master room-load orchestrator**: `PaintRoomItems` (`object.asm:2162`) — it walks the threaded
+object list and dispatches each `$08xx` id through `ID_Jump_Table`.
+
+### Still open
+
+- `obj_Frankie_Execute`'s exact entry label wasn't isolated (body confirmed over
+  `0x3b00`–`0x3d6b`).
 
 ### Handlers explicitly CONFIRMED (decompiled in this analysis)
 
