@@ -1,0 +1,6 @@
+# Ghidra project lock files (present only while the project is open)
+*.lock
+*.lock~
+
+# Ghidra transaction / temporary buffer files inside the project (*.rep)
+tmp*.ps
