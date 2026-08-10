@@ -16,7 +16,7 @@ The same program exists here in several forms. When you need to know *how the ga
    - `inc/CC_*.asm` are the includes: `CC_Data{Objects,Sprites,Sounds,Tables,Texts}.asm` (the actual graphics/level/sound data as `dc.b`), `CC_Objects.asm` (struct field offsets), `CC_Vars*.asm` / `CC_WorkAreas.asm` / `CC_Zpg.asm` (variable & zero-page layout).
 2. **Ghidra project** (`Castles.gpr` + `Castles.rep/`) over a full 64K RAM snapshot (program **`C64_MEMORY_DUMP.BIN`**), reachable through the **`ghidra` MCP tools**. Use this for code that lives in the main `creep` program rather than the `object.prg` overlay (e.g. `_mapDisplay`, `_mainLoop`, IRQ/music handlers). It carries extensive prior naming (functions, structs, constants).
 3. **IDA databases** (`creepload.prg.idb`, `The Castles of Dr. Creep/creepload.prg.i64`) — for the disk loader.
-4. **`docs/`** — analysis write-ups produced from the above: `room-level-format.md`, `sprite-multiplexer.md`, `object-behavior-table.md`. Good orientation, but verify against the asm.
+4. **`docs/`** — analysis write-ups produced from the above: `room-level-format.md`, `sprite-multiplexer.md`, `object-behavior-table.md`, `enemy-behavior.md` (Mummy/Frankenstein/beam/spark/force-field motion & AI), `sound-music.md` (the SID sound-effect + demo-music engine). Good orientation, but verify against the asm.
 
 The MCP `ghidra` tools work per-address (`decompile_function`, `disassemble_function`) — there is no list-functions / read-memory / strings endpoint, so navigate by following the call graph from known anchors. `disassemble_function(addr, filter_mnemonics="JSR,JMP")` is the way to discover a callee's address (the decompiler shows names, not addresses; correlate by call order). Useful entry anchors in the dump:
 
