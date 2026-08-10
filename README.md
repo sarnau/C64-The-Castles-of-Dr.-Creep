@@ -12,7 +12,9 @@ The same program is present here in complementary representations:
 
 - **`Creep Sourcecode/`** — a reconstructed DASM assembly of the game. This is the **authoritative
   reference** for how the game behaves. `asm/object.asm` is the engine (loaded at `$0800`);
-  `inc/CC_*.asm` hold the level/graphics/sound data and the variable/struct layouts.
+  `inc/CC_*.asm` hold the level/graphics/sound data and the variable/struct layouts. It builds on
+  macOS to binaries **byte-identical** to the shipped `prg/*.prg` — `brew install dasm && cd
+  "Creep Sourcecode" && ./build.sh` (see [`Creep Sourcecode/BUILD.md`](Creep%20Sourcecode/BUILD.md)).
 - **Ghidra project** (`Castles.gpr` / `Castles.rep/`) over a full 64K RAM snapshot
   (`C64_MEMORY_DUMP.BIN`) — used for code in the main program rather than the `object.prg` overlay.
 - **IDA databases** (`creepload.prg.idb`, `.../creepload.prg.i64`) — the disk loader.

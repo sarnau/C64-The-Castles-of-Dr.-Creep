@@ -4,3 +4,7 @@
 
 # Ghidra transaction / temporary buffer files inside the project (*.rep)
 tmp*.ps
+
+# DASM build outputs (regenerate with "Creep Sourcecode/build.sh")
+Creep Sourcecode/prg/*.built.prg
+Creep Sourcecode/lst/*.txt

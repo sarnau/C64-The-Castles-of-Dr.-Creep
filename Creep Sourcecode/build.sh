@@ -69,5 +69,7 @@ rc=0
 # The prg/*.orig.prg files are an EARLIER (2008) build of the game and are a
 # different binary (e.g. Object.orig.prg is ~28 KB vs this source's ~26 KB).
 build_one object Object.prg || rc=1
-# creep and PicATitle added in later tasks
+build_one creep  Creep.prg  || rc=1
+# PicATitle.prg is title-screen picture DATA (a multicolour bitmap), not code:
+# there is no PicATitle.asm to assemble, so it is not a build target.
 exit $rc
