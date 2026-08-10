@@ -1,0 +1,19 @@
+; ------------------------------------------------------------------------------------------------------------- ;
+; C64 CIA #1 (Complex Interface Adapter) Registers  $DC00-$DC0F
+; ------------------------------------------------------------------------------------------------------------- ;
+CIAPRA               = $DC00
+CIAPRB               = $DC01
+CIDDRA               = $DC02
+CIDDRB               = $DC03
+TIMALO               = $DC04
+TIMAHI               = $DC05
+TIMBLO               = $DC06
+TIMBHI               = $DC07
+TODTEN               = $DC08
+TODSEC               = $DC09
+TODMIN               = $DC0A
+TODHRS               = $DC0B
+CIASDR               = $DC0C
+CIAICR               = $DC0D
+CIACRA               = $DC0E
+CIACRB               = $DC0F

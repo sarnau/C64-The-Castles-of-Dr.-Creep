@@ -1,0 +1,19 @@
+; ------------------------------------------------------------------------------------------------------------- ;
+; C64 CIA #2 (Complex Interface Adapter) Registers  $DD00-$DD0F
+; ------------------------------------------------------------------------------------------------------------- ;
+CI2PRA               = $DD00
+CI2PRB               = $DD01
+C2DDRA               = $DD02
+C2DDRB               = $DD03
+TI2ALO               = $DD04
+TI2AHI               = $DD05
+TI2BLO               = $DD06
+TI2BHI               = $DD07
+TO2TEN               = $DD08
+TO2SEC               = $DD09
+TO2MIN               = $DD0A
+TO2HRS               = $DD0B
+CI2SDR               = $DD0C
+CI2ICR               = $DD0D
+CI2CRA               = $DD0E
+CI2CRB               = $DD0F
