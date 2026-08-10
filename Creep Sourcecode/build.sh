@@ -65,6 +65,9 @@ build_one() {                        # $1=asm base name, $2=orig .prg
 }
 
 rc=0
-build_one object Object.orig.prg || rc=1
+# Verify against prg/*.prg — the build this reconstructed source targets.
+# The prg/*.orig.prg files are an EARLIER (2008) build of the game and are a
+# different binary (e.g. Object.orig.prg is ~28 KB vs this source's ~26 KB).
+build_one object Object.prg || rc=1
 # creep and PicATitle added in later tasks
 exit $rc
